@@ -1,0 +1,169 @@
+@page "/"
+@inject CanvasService CanvasService
+@inject ParticleSystemService ParticleService
+@inject ThemeService ThemeService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>C# Creative Canvas - Digital Art Generator</PageTitle>
+
+<div class="flex flex-col lg:flex-row gap-8">
+    <div class="lg:w-3/4">
+        <div class="canvas-container">
+            <canvas id="creative-canvas" @ref="canvasElement"></canvas>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-4">
+            <button class="btn btn-primary" @onclick="GenerateNew">
+                <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-9 9 9 9 0 0 0 9 9 9 9 0 0 0 9-9Z"></path><path d="M9 12h6"></path><path d="M12 9v6"></path></svg>
+                    Generate New
+                </span>
+            </button>
+            <button class="btn btn-secondary" @onclick="SaveImage">
+                <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Save Image
+                </span>
+            </button>
+            <button class="btn btn-accent" @onclick="ShareImage">
+                <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    Share
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="lg:w-1/4">
+        <div class="controls-panel p-6">
+            <h2 class="text-xl font-bold mb-6">Controls</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-lg mb-3">Particle System</h3>
+                <div class="mb-4">
+                    <label class="block mb-2">Particle Count</label>
+                    <div class="flex items-center">
+                        <input type="range" min="10" max="1000" step="10" @bind="ParticleCount" @bind:event="oninput" @onchange="UpdateParticles" class="w-full" />
+                        <span class="ml-2 w-12 text-right">@ParticleCount</span>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Speed</label>
+                    <div class="flex items-center">
+                        <input type="range" min="1" max="10" step="0.5" @bind="ParticleSpeed" @bind:event="oninput" @onchange="UpdateParticles" class="w-full" />
+                        <span class="ml-2 w-12 text-right">@ParticleSpeed</span>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Size</label>
+                    <div class="flex items-center">
+                        <input type="range" min="1" max="20" step="1" @bind="ParticleSize" @bind:event="oninput" @onchange="UpdateParticles" class="w-full" />
+                        <span class="ml-2 w-12 text-right">@ParticleSize</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg mb-3">Effects</h3>
+                <div class="mb-4">
+                    <label class="block mb-2">Connection Lines</label>
+                    <label class="switch">
+                        <input type="checkbox" @bind="ShowConnections" @onchange="UpdateParticles" />
+                        <span class="ml-2">@(ShowConnections ? "Enabled" : "Disabled")</span>
+                    </label>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Flow Field</label>
+                    <label class="switch">
+                        <input type="checkbox" @bind="UseFlowField" @onchange="UpdateParticles" />
+                        <span class="ml-2">@(UseFlowField ? "Enabled" : "Disabled")</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-lg mb-3">Color Theme</h3>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    @foreach (var theme in Themes)
+                    {
+                        <button @onclick="() => SelectTheme(theme.Key)" class="w-8 h-8 rounded-full @(CurrentTheme == theme.Key ? "ring-2 ring-white ring-offset-2 ring-offset-gray-800" : "")" style="background-color: @theme.Value.PrimaryColor;"></button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-12">
+    <h2 class="text-2xl font-bold mb-4">About This Project</h2>
+    <p class="text-gray-300 mb-4">
+        Creative Canvas is an interactive digital art generator built with C# and Blazor WebAssembly. 
+        Create beautiful procedural art by adjusting the particle system parameters and watching them come to life.
+    </p>
+    <p class="text-gray-300">
+        Experiment with different themes, particle behaviors, and effects to create unique visual compositions.
+        Save your creations or share them with others.
+    </p>
+</div>
+
+@code {
+    private ElementReference canvasElement;
+    private int ParticleCount { get; set; } = 200;
+    private double ParticleSpeed { get; set; } = 3;
+    private int ParticleSize { get; set; } = 5;
+    private bool ShowConnections { get; set; } = true;
+    private bool UseFlowField { get; set; } = false;
+    private string CurrentTheme { get; set; } = "cosmic";
+    
+    private Dictionary<string, ColorTheme> Themes = new Dictionary<string, ColorTheme>
+    {
+        { "cosmic", new ColorTheme { PrimaryColor = "#3B82F6", SecondaryColor = "#8B5CF6", BackgroundColor = "#000000" } },
+        { "sunset", new ColorTheme { PrimaryColor = "#F97316", SecondaryColor = "#EC4899", BackgroundColor = "#0F172A" } },
+        { "emerald", new ColorTheme { PrimaryColor = "#10B981", SecondaryColor = "#3B82F6", BackgroundColor = "#0F172A" } },
+        { "ruby", new ColorTheme { PrimaryColor = "#EF4444", SecondaryColor = "#F97316", BackgroundColor = "#18181B" } },
+        { "ocean", new ColorTheme { PrimaryColor = "#06B6D4", SecondaryColor = "#8B5CF6", BackgroundColor = "#0C4A6E" } },
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeCanvas();
+        }
+    }
+
+    private async Task InitializeCanvas()
+    {
+        await CanvasService.InitializeAsync(canvasElement, JSRuntime);
+        await ParticleService.InitializeAsync(CanvasService, ThemeService);
+        await ThemeService.SetThemeAsync(Themes[CurrentTheme]);
+        await UpdateParticles();
+    }
+
+    private async Task GenerateNew()
+    {
+        await ParticleService.ResetAsync(ParticleCount, ParticleSpeed, ParticleSize, ShowConnections, UseFlowField);
+    }
+
+    private async Task UpdateParticles()
+    {
+        await ParticleService.UpdateAsync(ParticleCount, ParticleSpeed, ParticleSize, ShowConnections, UseFlowField);
+    }
+
+    private async Task SelectTheme(string themeName)
+    {
+        CurrentTheme = themeName;
+        await ThemeService.SetThemeAsync(Themes[themeName]);
+        await ParticleService.UpdateColorsAsync();
+    }
+
+    private async Task SaveImage()
+    {
+        await CanvasService.SaveImageAsync("creative-canvas-artwork.png");
+    }
+
+    private async Task ShareImage()
+    {
+        // In a real implementation, this would upload the image to a server
+        // and generate a shareable link or open a share dialog
+        await JSRuntime.InvokeVoidAsync("alert", "Sharing functionality would be implemented here!");
+    }
+}

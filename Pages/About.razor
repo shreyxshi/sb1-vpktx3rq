@@ -1,0 +1,56 @@
+@page "/about"
+
+<PageTitle>About - C# Creative Canvas</PageTitle>
+
+<div class="max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">About Creative Canvas</h1>
+    
+    <div class="bg-gray-800 bg-opacity-50 p-6 rounded-lg mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Project Overview</h2>
+        <p class="text-gray-300 mb-4">
+            Creative Canvas is an interactive digital art generator built with C# and Blazor WebAssembly. This project demonstrates 
+            how C# can be used to create engaging visual web applications that run directly in the browser.
+        </p>
+        <p class="text-gray-300">
+            The project uses procedural generation techniques to create unique particle systems that
+            respond to user input and can be customized in real-time.
+        </p>
+    </div>
+    
+    <div class="bg-gray-800 bg-opacity-50 p-6 rounded-lg mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Technologies Used</h2>
+        <ul class="list-disc pl-6 text-gray-300 space-y-2">
+            <li>C# programming language</li>
+            <li>Blazor WebAssembly for client-side C# execution</li>
+            <li>HTML5 Canvas for rendering</li>
+            <li>Tailwind CSS for styling</li>
+            <li>JavaScript interop for canvas manipulation</li>
+        </ul>
+    </div>
+    
+    <div class="bg-gray-800 bg-opacity-50 p-6 rounded-lg mb-8">
+        <h2 class="text-2xl font-semibold mb-4">How It Works</h2>
+        <p class="text-gray-300 mb-4">
+            The application uses a particle system that simulates the movement of thousands of individual particles. 
+            Each particle follows rules that determine its behavior, creating emergent patterns and visually interesting effects.
+        </p>
+        <p class="text-gray-300 mb-4">
+            Users can control various parameters of the particle system:
+        </p>
+        <ul class="list-disc pl-6 text-gray-300 space-y-2 mb-4">
+            <li>Particle count: The number of particles in the system</li>
+            <li>Speed: How quickly the particles move</li>
+            <li>Size: The size of each particle</li>
+            <li>Connection lines: Whether particles should draw lines between each other when they're close</li>
+            <li>Flow field: Whether particles should follow a procedurally generated flow field</li>
+        </ul>
+        <p class="text-gray-300">
+            The application also allows users to change color themes and save or share their creations.
+        </p>
+    </div>
+    
+    <div class="text-center my-12">
+        <a href="/" class="btn btn-primary mx-2">Create Your Own Art</a>
+        <a href="/gallery" class="btn btn-secondary mx-2">View Gallery</a>
+    </div>
+</div>

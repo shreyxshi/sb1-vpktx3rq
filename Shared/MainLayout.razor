@@ -1,0 +1,13 @@
+@inherits LayoutComponentBase
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+    <NavMenu />
+    <main class="container mx-auto px-4 py-8">
+        @Body
+    </main>
+    <footer class="py-6 text-center text-gray-400 text-sm">
+        <div class="container mx-auto">
+            <p>Creative Canvas &copy; @DateTime.Now.Year - Created with C# and Blazor WebAssembly</p>
+        </div>
+    </footer>
+</div>
